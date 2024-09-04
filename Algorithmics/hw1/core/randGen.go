@@ -7,15 +7,15 @@ import (
 )
 
 // Attempting Generics
-func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
-	var s V
-	for _, v := range m {
-		s += v
-	}
-	return s
+
+type RandStats struct {
+	Avg                 float64
+	P50                 int64
+	PositivesPercentage float64
+	NegativePercentage  float64
 }
 
-func GenerateRandListG[V int16 | int32 | int64](n int64) []V {
+func GenerateRandListG[V int8 | int16 | int32 | int64](n int64) []V {
 	values := make([]V, n)
 	for i := range values {
 		values[i] = V(mathV2.Int64() << 1)
@@ -23,7 +23,7 @@ func GenerateRandListG[V int16 | int32 | int64](n int64) []V {
 	return values
 }
 
-func CheckDistributionOfPositivesAndNegaties[V int16 | int32 | int64](values []V) (float64, float64) {
+func CheckDistributionOfPositivesAndNegatiesG[V int8 | int16 | int32 | int64](values []V) (float64, float64) {
 	positiveBalance := 0.0
 	negativeBalance := 0.0
 
@@ -44,34 +44,7 @@ func CheckDistributionOfPositivesAndNegaties[V int16 | int32 | int64](values []V
 	return positiveGap, negativeGap
 }
 
-// ORIGINAL
-type RandStats struct {
-	Avg float64
-	P50 int64
-}
-
-func GenerateRandList(n int64) []int64 {
-	values := make([]int64, n)
-	for i := range values {
-		values[i] = mathV2.Int64() << 1
-	}
-	return values
-}
-
-func sortSlice(slops []int64) {
-	sort.Slice(slops, func(i, j int) bool {
-		return slops[i] < slops[j]
-	})
-}
-
-func absDiffInt(x, y int64) int64 {
-	if x < y {
-		return y - x
-	}
-	return x - y
-}
-
-func CheckAvgDistance(values []int64) RandStats {
+func CheckAvgDistanceG[V int8 | int16 | int32 | int64](values []V) RandStats {
 	slops := make([]int64, len(values)-1) // the last number will not have a pair to check agains
 	var accomulativeAvg int64 = 0
 	for index := range values {
@@ -79,13 +52,26 @@ func CheckAvgDistance(values []int64) RandStats {
 			break
 		}
 
-		slops[index] = absDiffInt(values[index], values[index+1])
+		slops[index] = int64(absDiffIntG[V](values[index], values[index+1]))
 		accomulativeAvg += slops[index]
 	}
 
-	sortSlice(slops)
+	sortSliceG(slops)
 	return RandStats{
 		Avg: float64(accomulativeAvg) / float64(len(slops)),
 		P50: slops[len(slops)/2],
 	}
+}
+
+func sortSliceG[V int8 | int16 | int32 | int64](slops []V) {
+	sort.Slice(slops, func(i, j int) bool {
+		return slops[i] < slops[j]
+	})
+}
+
+func absDiffIntG[V int8 | int16 | int32 | int64](x, y V) V {
+	if x < y {
+		return y - x
+	}
+	return x - y
 }

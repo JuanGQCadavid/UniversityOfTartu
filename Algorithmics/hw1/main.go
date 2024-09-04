@@ -3,71 +3,33 @@ package main
 import (
 	"fmt"
 	"hw1/core"
-	mathV2 "math/rand/v2"
+	"math"
 )
 
-func testingRamDist() {
-	fmt.Println(mathV2.Int32())
-
-	var capacity int64 = 1 << 8 // 62 Why is this the max ?
-	fmt.Println(capacity)
-
-	values := core.GenerateRandList(capacity)
-
-	positiveGap, negativeGap := checkDistributionOfPositivesAndNegaties(values)
-	fmt.Println("Positives: ", positiveGap)
-	fmt.Println("Negatives: ", negativeGap)
+type RandSResult struct {
+	NumberOfElements int64
+	Epoch            int64
+	StatsPerEpoch    []core.RandStats
+	Summary          core.RandStats
 }
 
-func checkDistributionOfPositivesAndNegaties(values []int64) (float64, float64) {
-	positiveBalance := 0.0
-	negativeBalance := 0.0
-
-	for i := range values {
-		if values[i] < 0 {
-			negativeBalance++
-			continue
-		}
-		positiveBalance++
+var (
+	testCases []int64 = []int64{
+		int64(math.Pow10(3)),
+		int64(math.Pow10(4)),
+		int64(math.Pow10(5)),
+		int64(math.Pow10(6)),
+		int64(math.Pow10(7)),
+		int64(math.Pow10(8)),
+		int64(math.Pow10(9)),
+		int64(math.Pow10(10)),
+		int64(math.Pow10(11)),
+		int64(math.Pow10(12)),
 	}
-
-	fmt.Println("Positives: ", positiveBalance)
-	fmt.Println("Negatives: ", negativeBalance)
-
-	positiveGap := (positiveBalance / (positiveBalance + negativeBalance)) * 100
-	negativeGap := (negativeBalance / (positiveBalance + negativeBalance)) * 100
-
-	return positiveGap, negativeGap
-}
-func testingRamDistV2() {
-
-	var capacity int64 = 1 << 8 // 62 Why is this the max ?
-	fmt.Println(capacity)
-
-	values := core.GenerateRandListG[int16](capacity)
-
-	positiveGap, negativeGap := core.CheckDistributionOfPositivesAndNegaties(values)
-	fmt.Println("Positives: ", positiveGap)
-	fmt.Println("Negatives: ", negativeGap)
-}
+)
 
 func main() {
-	testingRamDistV2()
-}
-
-func checkingAvgDistance() {
-	testDemo := []int64{
-		-10,
-		1,
-		2,
-		3,
-		4,
-		5,
-		23,
+	for tt := range testCases {
+		fmt.Println(testCases[tt])
 	}
-
-	val := core.CheckAvgDistance(testDemo)
-
-	fmt.Println("Avg: ", val.Avg)
-	fmt.Println("P50: ", val.P50)
 }
