@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"hw1/core"
 	"math"
+	"time"
+
+	"gonum.org/v1/plot/plotter"
 )
 
 type DataType string
@@ -29,8 +32,8 @@ type RandSResult struct {
 var (
 	testCases []int64 = []int64{
 		int64(math.Pow10(3)),
-		// int64(math.Pow10(4)),
-		// int64(math.Pow10(5)),
+		int64(math.Pow10(4)),
+		int64(math.Pow10(5)),
 		// int64(math.Pow10(6)),
 		// int64(math.Pow10(7)),
 		// int64(math.Pow10(8)),
@@ -57,37 +60,63 @@ func main() {
 	for result := range results {
 		fmt.Println("Results for", result)
 		for key, val := range results[result] {
-			fmt.Printf("%s: %+v\n", key, val)
+			fmt.Printf("%s: %+v\n", key, val.Summary)
 		}
 	}
+
+	generatePlots(results)
+}
+
+func generatePlots(results map[int64]map[DataType]*RandSResult) {
+
+	toPlot := make(map[string]plotter.XYs)
+	index := 0
+	for n, result := range results {
+		for dataType, randResult := range result {
+			if len(toPlot[string(dataType)]) == 0 {
+				toPlot[string(dataType)] = make(plotter.XYs, len(results))
+			}
+
+			toPlot[string(dataType)][index].X = float64(n)
+			toPlot[string(dataType)][index].Y = randResult.Summary.Timing
+
+		}
+		index++
+	}
+
+	core.GenerateLinePlot("Length vs Time per data type", "N Size", "Time in seconds", toPlot)
+
 }
 
 func runRand(n int64) map[DataType]*RandSResult {
 	result := make(map[DataType]*RandSResult)
 	for _, dType := range dataCases {
-		var randSResult RandSResult = RandSResult{
-			NumberOfElements: n,
-			Epoch:            EPOCHS,
-		}
+		var randSResult RandSResult
 		switch dType {
 		case INT8:
-			randSResult.StatsPerEpoch = runEpochsRand[int8](n, EPOCHS)
+			randSResult = runEpochsRand[int8](n, EPOCHS)
 		case INT16:
-			randSResult.StatsPerEpoch = runEpochsRand[int16](n, EPOCHS)
+			randSResult = runEpochsRand[int16](n, EPOCHS)
 		case INT32:
-			randSResult.StatsPerEpoch = runEpochsRand[int32](n, EPOCHS)
+			randSResult = runEpochsRand[int32](n, EPOCHS)
 		case INT64:
-			randSResult.StatsPerEpoch = runEpochsRand[int64](n, EPOCHS)
+			randSResult = runEpochsRand[int64](n, EPOCHS)
 		}
 		result[dType] = &randSResult
 	}
 	return result
 }
 
-func runEpochsRand[V int8 | int16 | int32 | int64](n int64, epochs int) []core.RandStats {
+// Here we should add the logic for the timer and the resumed of the randStats
+func runEpochsRand[V int8 | int16 | int32 | int64](n int64, epochs int) RandSResult {
 	var randStats = make([]core.RandStats, epochs)
+
 	for i := 0; i < epochs; i++ {
+
+		start := time.Now()
 		val := core.GenerateRandListG[V](n)
+		timing := time.Since(start).Seconds() // monotonic clock
+
 		checks := core.CheckAvgDistanceG[V](val)
 		positiveGap, negativeGap := core.CheckDistributionOfPositivesAndNegatiesG[V](val)
 
@@ -95,8 +124,40 @@ func runEpochsRand[V int8 | int16 | int32 | int64](n int64, epochs int) []core.R
 		checks.NegativePercentage = negativeGap
 		checks.PositivesPercentage = positiveGap
 
+		// Adding timing
+		checks.Timing = timing
 		randStats[i] = checks
 	}
 
-	return randStats
+	return RandSResult{
+		NumberOfElements: n,
+		Epoch:            epochs,
+		StatsPerEpoch:    randStats,
+		Summary:          resumedEpochs(randStats),
+	}
+}
+
+func resumedEpochs(stats []core.RandStats) core.RandStats {
+
+	var avgTime, avgSlope, avgNegatives, avgPositives float64
+
+	for _, stat := range stats {
+		avgTime += stat.Timing
+		avgSlope += stat.Avg
+		avgNegatives += stat.NegativePercentage
+		avgPositives += stat.PositivesPercentage
+	}
+
+	avgTime = avgTime / float64(len(stats))
+	avgSlope = avgSlope / float64(len(stats))
+	avgNegatives = avgNegatives / float64(len(stats))
+	avgPositives = avgPositives / float64(len(stats))
+
+	return core.RandStats{
+		Avg:                 avgSlope,
+		Timing:              avgTime,
+		NegativePercentage:  avgNegatives,
+		PositivesPercentage: avgPositives,
+	}
+
 }

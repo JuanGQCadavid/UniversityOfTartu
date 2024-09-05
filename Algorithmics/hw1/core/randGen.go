@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	mathV2 "math/rand/v2"
 	"sort"
 )
@@ -13,6 +12,7 @@ type RandStats struct {
 	P50                 int64
 	PositivesPercentage float64
 	NegativePercentage  float64
+	Timing              float64
 }
 
 func GenerateRandListG[V int8 | int16 | int32 | int64](n int64) []V {
@@ -34,9 +34,6 @@ func CheckDistributionOfPositivesAndNegatiesG[V int8 | int16 | int32 | int64](va
 		}
 		positiveBalance++
 	}
-
-	fmt.Println("Positives: ", positiveBalance)
-	fmt.Println("Negatives: ", negativeBalance)
 
 	positiveGap := (positiveBalance / (positiveBalance + negativeBalance)) * 100
 	negativeGap := (negativeBalance / (positiveBalance + negativeBalance)) * 100
