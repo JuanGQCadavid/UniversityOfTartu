@@ -37,8 +37,10 @@ var (
 		// int64(math.Pow10(6)),
 		// int64(math.Pow10(7)),
 		// int64(math.Pow10(8)),
+
+		// Well this one at lest finalized
 		// int64(math.Pow10(9)),
-		// int64(math.Pow10(10)),
+		// int64(math.Pow10(10)), // This one is on my cp limits
 		// int64(math.Pow10(11)),
 		// int64(math.Pow10(12)),
 	}
@@ -65,6 +67,32 @@ func main() {
 	}
 
 	generatePlots(results)
+	generateNegativePositivePlots(results)
+}
+
+func generateNegativePositivePlots(results map[int64]map[DataType]*RandSResult) {
+	for i, testCases := range results {
+		var (
+			name           string   = fmt.Sprintf("Negative and positives distribution for N=%d", i)
+			xNames         []string = make([]string, 0, len(testCases))
+			yLabel         string   = "Percentage"
+			dimensionNames []string = []string{
+				"Negative",
+				"Positive",
+			}
+			negativeDimension []float64 = make([]float64, 0, len(testCases))
+			positiveDimension []float64 = make([]float64, 0, len(testCases))
+		)
+
+		for ii, theCase := range testCases {
+			xNames = append(xNames, string(ii))
+			negativeDimension = append(negativeDimension, theCase.Summary.NegativePercentage)
+			positiveDimension = append(positiveDimension, theCase.Summary.PositivesPercentage)
+
+		}
+		fmt.Println("Printing: ", i)
+		core.GenerateBarPlot(name, yLabel, xNames, dimensionNames, negativeDimension, positiveDimension)
+	}
 }
 
 func generatePlots(results map[int64]map[DataType]*RandSResult) {
@@ -83,9 +111,7 @@ func generatePlots(results map[int64]map[DataType]*RandSResult) {
 		}
 		index++
 	}
-
 	core.GenerateLinePlot("Length vs Time per data type", "N Size", "Time in seconds", toPlot)
-
 }
 
 func runRand(n int64) map[DataType]*RandSResult {
