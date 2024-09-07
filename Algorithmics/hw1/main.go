@@ -8,8 +8,10 @@ import (
 	"os"
 	"runtime"
 	"sort"
+	"strings"
 	"time"
 
+	"gonum.org/v1/gonum/stat"
 	"gonum.org/v1/plot/plotter"
 )
 
@@ -90,34 +92,44 @@ func generateSummaryText(results map[int64]map[DataType]*RandSResult) {
 	defer historicalFile.Close()
 
 	w := bufio.NewWriter(f)
-	w.WriteString("N, Data type, Avg timing, Avg slope, Avg Negatives, Avg Positives\n")
+	w.WriteString("N; Data type; Avg slope; Avg Negatives; Avg Positives; StdDe Time; Mean Time; Cov Time \n")
 
 	historicalFileBuffer := bufio.NewWriter(historicalFile)
-	historicalFileBuffer.WriteString("N, Data type, Epoch, Timing\n")
+	historicalFileBuffer.WriteString("N; Data type; Epoch; Timing\n")
 
 	for n, result := range results {
 		for dataType, randResult := range result {
+
+			newLine := fmt.Sprintf(
+				"%d; %s; %f; %f; %f; %f; %f; %f\n",
+				n,
+				string(dataType),
+				randResult.Summary.Avg,
+				randResult.Summary.NegativePercentage,
+				randResult.Summary.PositivesPercentage,
+				randResult.Summary.TimingStdDev,
+				randResult.Summary.Timing,
+				randResult.Summary.TimingCoefficientOfVariation,
+			)
+
+			newLine = strings.ReplaceAll(newLine, ".", ",")
 			w.WriteString(
-				fmt.Sprintf(
-					"%d, %s, %f, %f, %f, %f\n",
-					n,
-					string(dataType),
-					randResult.Summary.Timing,
-					randResult.Summary.Avg,
-					randResult.Summary.NegativePercentage,
-					randResult.Summary.PositivesPercentage,
-				),
+				newLine,
 			)
 
 			for i, statsPerEpoch := range randResult.StatsPerEpoch {
+				newLine := fmt.Sprintf(
+					"%d; %s; %d; %f\n",
+					n,
+					string(dataType),
+					i,
+					statsPerEpoch.Timing,
+				)
+
+				newLine = strings.ReplaceAll(newLine, ".", ",")
+
 				historicalFileBuffer.WriteString(
-					fmt.Sprintf(
-						"%d, %s, %d, %f\n",
-						n,
-						string(dataType),
-						i,
-						statsPerEpoch.Timing,
-					),
+					newLine,
 				)
 			}
 
@@ -256,25 +268,30 @@ func runEpochsRand[V int8 | int16 | int32 | int64](n int64, epochs int) RandSRes
 
 func resumedEpochs(stats []core.RandStats) core.RandStats {
 
-	var avgTime, avgSlope, avgNegatives, avgPositives float64
+	var avgSlope, avgNegatives, avgPositives float64
+	var timingClokcs []float64 = make([]float64, 0, len(stats))
 
 	for _, stat := range stats {
-		avgTime += stat.Timing
 		avgSlope += stat.Avg
 		avgNegatives += stat.NegativePercentage
 		avgPositives += stat.PositivesPercentage
+		timingClokcs = append(timingClokcs, stat.Timing)
 	}
-
-	avgTime = avgTime / float64(len(stats))
 	avgSlope = avgSlope / float64(len(stats))
 	avgNegatives = avgNegatives / float64(len(stats))
 	avgPositives = avgPositives / float64(len(stats))
 
+	mean := stat.Mean(timingClokcs, nil)
+	stdDev := stat.StdDev(timingClokcs, nil)
+	cov := (stdDev / mean) * 100
+
 	return core.RandStats{
-		Avg:                 avgSlope,
-		Timing:              avgTime,
-		NegativePercentage:  avgNegatives,
-		PositivesPercentage: avgPositives,
+		Avg:                          avgSlope,
+		Timing:                       mean,
+		NegativePercentage:           avgNegatives,
+		PositivesPercentage:          avgPositives,
+		TimingStdDev:                 stdDev,
+		TimingCoefficientOfVariation: cov,
 	}
 
 }

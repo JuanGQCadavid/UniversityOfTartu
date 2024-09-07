@@ -8,11 +8,13 @@ import (
 // Attempting Generics
 
 type RandStats struct {
-	Avg                 float64
-	P50                 int64
-	PositivesPercentage float64
-	NegativePercentage  float64
-	Timing              float64
+	Avg                          float64
+	P50                          int64
+	PositivesPercentage          float64
+	NegativePercentage           float64
+	Timing                       float64
+	TimingStdDev                 float64
+	TimingCoefficientOfVariation float64
 }
 
 func GenerateRandListG[V int8 | int16 | int32 | int64](n int64) []V {
