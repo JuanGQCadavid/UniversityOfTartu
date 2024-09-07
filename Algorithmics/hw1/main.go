@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"hw1/core"
 	"math"
+	"os"
+	"runtime"
+	"sort"
 	"time"
 
 	"gonum.org/v1/plot/plotter"
@@ -56,6 +60,7 @@ func main() {
 	var results = make(map[int64]map[DataType]*RandSResult)
 	for _, tt := range testCases {
 		fmt.Println(tt)
+		runtime.GC() // We call GC before starting in order to clean the golang memory stack and have more free space
 		results[tt] = runRand(tt)
 	}
 
@@ -68,9 +73,41 @@ func main() {
 
 	generatePlots(results)
 	generateNegativePositivePlots(results)
+	generateSummaryText(results)
+}
+
+func generateSummaryText(results map[int64]map[DataType]*RandSResult) {
+	f, err := os.Create("data.csv")
+
+	if err != nil {
+		panic(err)
+	}
+
+	w := bufio.NewWriter(f)
+	w.WriteString("N, Data type, Avg timing, Avg slope, Avg Negatives, Avg Positives\n")
+
+	for n, result := range results {
+		for dataType, randResult := range result {
+			w.WriteString(
+				fmt.Sprintf(
+					"%d, %s, %f, %f, %f, %f\n",
+					n,
+					string(dataType),
+					randResult.Summary.Timing,
+					randResult.Summary.Avg,
+					randResult.Summary.NegativePercentage,
+					randResult.Summary.PositivesPercentage,
+				),
+			)
+		}
+	}
+
+	w.Flush()
+
 }
 
 func generateNegativePositivePlots(results map[int64]map[DataType]*RandSResult) {
+
 	for i, testCases := range results {
 		var (
 			name           string   = fmt.Sprintf("Negative and positives distribution for N=%d", i)
@@ -88,8 +125,8 @@ func generateNegativePositivePlots(results map[int64]map[DataType]*RandSResult) 
 			xNames = append(xNames, string(ii))
 			negativeDimension = append(negativeDimension, theCase.Summary.NegativePercentage)
 			positiveDimension = append(positiveDimension, theCase.Summary.PositivesPercentage)
-
 		}
+
 		fmt.Println("Printing: ", i)
 		core.GenerateBarPlot(name, yLabel, xNames, dimensionNames, negativeDimension, positiveDimension)
 	}
@@ -97,21 +134,46 @@ func generateNegativePositivePlots(results map[int64]map[DataType]*RandSResult) 
 
 func generatePlots(results map[int64]map[DataType]*RandSResult) {
 
+	keys := make([]int64, 0, len(results))
+
+	for key := range results {
+		keys = append(keys, key)
+	}
+
+	sort.Slice(keys, func(i, j int) bool {
+		return i < j
+	})
+
 	toPlot := make(map[string]plotter.XYs)
 	index := 0
-	for n, result := range results {
-		for dataType, randResult := range result {
-			if len(toPlot[string(dataType)]) == 0 {
-				toPlot[string(dataType)] = make(plotter.XYs, len(results))
-			}
 
-			toPlot[string(dataType)][index].X = float64(n)
-			toPlot[string(dataType)][index].Y = randResult.Summary.Timing
+	fmt.Printf("%v\n", keys)
 
-		}
-		index++
+	chunks := [][]int64{
+		// keys,
+		keys[0 : len(keys)/2],
+		keys[len(keys)/2:],
 	}
-	core.GenerateLinePlot("Length vs Time per data type", "N Size", "Time in seconds", toPlot)
+
+	for _, chunk := range chunks {
+		fmt.Printf("%v\n", chunk)
+		for _, n := range chunk {
+			result := results[n]
+			for dataType, randResult := range result {
+				if len(toPlot[string(dataType)]) == 0 {
+					toPlot[string(dataType)] = make(plotter.XYs, len(results))
+				}
+
+				toPlot[string(dataType)][index].X = float64(n)
+				toPlot[string(dataType)][index].Y = randResult.Summary.Timing
+
+			}
+			index++
+		}
+		core.GenerateLinePlot(fmt.Sprintf("N %v vs Time per data type", chunk), "N", "Time in seconds", toPlot)
+
+	}
+
 }
 
 func runRand(n int64) map[DataType]*RandSResult {
