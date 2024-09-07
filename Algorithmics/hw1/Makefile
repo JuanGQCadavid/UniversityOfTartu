@@ -1,6 +1,8 @@
-run:
+run: clear
 	go run main.go
 
-clean:
+clear:
 	rm *.png \
-	&& rm data.csv 
+	&& rm data.csv \
+	&& rm historical.csv 
+

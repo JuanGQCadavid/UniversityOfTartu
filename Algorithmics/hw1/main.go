@@ -78,13 +78,22 @@ func main() {
 
 func generateSummaryText(results map[int64]map[DataType]*RandSResult) {
 	f, err := os.Create("data.csv")
-
 	if err != nil {
 		panic(err)
 	}
+	defer f.Close()
+
+	historicalFile, err := os.Create("historical.csv")
+	if err != nil {
+		panic(err)
+	}
+	defer historicalFile.Close()
 
 	w := bufio.NewWriter(f)
 	w.WriteString("N, Data type, Avg timing, Avg slope, Avg Negatives, Avg Positives\n")
+
+	historicalFileBuffer := bufio.NewWriter(historicalFile)
+	historicalFileBuffer.WriteString("N, Data type, Epoch, Timing\n")
 
 	for n, result := range results {
 		for dataType, randResult := range result {
@@ -99,10 +108,24 @@ func generateSummaryText(results map[int64]map[DataType]*RandSResult) {
 					randResult.Summary.PositivesPercentage,
 				),
 			)
+
+			for i, statsPerEpoch := range randResult.StatsPerEpoch {
+				historicalFileBuffer.WriteString(
+					fmt.Sprintf(
+						"%d, %s, %d, %f\n",
+						n,
+						string(dataType),
+						i,
+						statsPerEpoch.Timing,
+					),
+				)
+			}
+
 		}
 	}
 
 	w.Flush()
+	historicalFileBuffer.Flush()
 
 }
 
@@ -132,8 +155,7 @@ func generateNegativePositivePlots(results map[int64]map[DataType]*RandSResult) 
 	}
 }
 
-func generatePlots(results map[int64]map[DataType]*RandSResult) {
-
+func getSortedKeys(results map[int64]map[DataType]*RandSResult) []int64 {
 	keys := make([]int64, 0, len(results))
 
 	for key := range results {
@@ -143,6 +165,13 @@ func generatePlots(results map[int64]map[DataType]*RandSResult) {
 	sort.Slice(keys, func(i, j int) bool {
 		return i < j
 	})
+
+	return keys
+}
+
+func generatePlots(results map[int64]map[DataType]*RandSResult) {
+
+	keys := getSortedKeys(results)
 
 	toPlot := make(map[string]plotter.XYs)
 	index := 0
