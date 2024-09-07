@@ -40,7 +40,7 @@ var (
 		int64(math.Pow10(3)),
 		int64(math.Pow10(4)),
 		int64(math.Pow10(5)),
-		// int64(math.Pow10(6)),
+		int64(math.Pow10(6)),
 		// int64(math.Pow10(7)),
 		// int64(math.Pow10(8)),
 
@@ -61,7 +61,7 @@ var (
 func main() {
 	var results = make(map[int64]map[DataType]*RandSResult)
 	for _, tt := range testCases {
-		includeNegatives := true
+		includeNegatives := false
 		fmt.Println(tt)
 		runtime.GC() // We call GC before starting in order to clean the golang memory stack and have more free space
 		results[tt] = runRand(tt, includeNegatives)
@@ -185,19 +185,17 @@ func getSortedKeys(results map[int64]map[DataType]*RandSResult) []int64 {
 func generatePlots(results map[int64]map[DataType]*RandSResult) {
 
 	keys := getSortedKeys(results)
-
-	toPlot := make(map[string]plotter.XYs)
-	index := 0
-
 	fmt.Printf("%v\n", keys)
-
 	chunks := [][]int64{
-		// keys,
+		keys,
+		keys[0:1],
 		keys[0 : len(keys)/2],
 		keys[len(keys)/2:],
 	}
 
 	for _, chunk := range chunks {
+		index := 0
+		toPlot := make(map[string]plotter.XYs)
 		fmt.Printf("%v\n", chunk)
 		for _, n := range chunk {
 			result := results[n]
