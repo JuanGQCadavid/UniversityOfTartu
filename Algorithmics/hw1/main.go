@@ -61,9 +61,10 @@ var (
 func main() {
 	var results = make(map[int64]map[DataType]*RandSResult)
 	for _, tt := range testCases {
+		includeNegatives := true
 		fmt.Println(tt)
 		runtime.GC() // We call GC before starting in order to clean the golang memory stack and have more free space
-		results[tt] = runRand(tt)
+		results[tt] = runRand(tt, includeNegatives)
 	}
 
 	for result := range results {
@@ -217,19 +218,19 @@ func generatePlots(results map[int64]map[DataType]*RandSResult) {
 
 }
 
-func runRand(n int64) map[DataType]*RandSResult {
+func runRand(n int64, includeNegatives bool) map[DataType]*RandSResult {
 	result := make(map[DataType]*RandSResult)
 	for _, dType := range dataCases {
 		var randSResult RandSResult
 		switch dType {
 		case INT8:
-			randSResult = runEpochsRand[int8](n, EPOCHS)
+			randSResult = runEpochsRand[int8](n, EPOCHS, includeNegatives)
 		case INT16:
-			randSResult = runEpochsRand[int16](n, EPOCHS)
+			randSResult = runEpochsRand[int16](n, EPOCHS, includeNegatives)
 		case INT32:
-			randSResult = runEpochsRand[int32](n, EPOCHS)
+			randSResult = runEpochsRand[int32](n, EPOCHS, includeNegatives)
 		case INT64:
-			randSResult = runEpochsRand[int64](n, EPOCHS)
+			randSResult = runEpochsRand[int64](n, EPOCHS, includeNegatives)
 		}
 		result[dType] = &randSResult
 	}
@@ -237,13 +238,13 @@ func runRand(n int64) map[DataType]*RandSResult {
 }
 
 // Here we should add the logic for the timer and the resumed of the randStats
-func runEpochsRand[V int8 | int16 | int32 | int64](n int64, epochs int) RandSResult {
+func runEpochsRand[V int8 | int16 | int32 | int64](n int64, epochs int, includeNegatives bool) RandSResult {
 	var randStats = make([]core.RandStats, epochs)
 
 	for i := 0; i < epochs; i++ {
 
 		start := time.Now()
-		val := core.GenerateRandListG[V](n)
+		val := core.GenerateRandListG[V](n, includeNegatives)
 		timing := time.Since(start).Seconds() // monotonic clock
 
 		checks := core.CheckAvgDistanceG[V](val)

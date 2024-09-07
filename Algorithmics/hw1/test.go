@@ -48,7 +48,7 @@ func testingRamDistV2() {
 	var capacity int64 = 1 << 8 // 62 Why is this the max ?
 	fmt.Println(capacity)
 
-	values := core.GenerateRandListG[int64](capacity)
+	values := core.GenerateRandListG[int64](capacity, true)
 	positiveGap, negativeGap := core.CheckDistributionOfPositivesAndNegatiesG[int64](values)
 	fmt.Println("Positives: ", positiveGap)
 	fmt.Println("Negatives: ", negativeGap)
@@ -58,7 +58,7 @@ func fullTets() {
 	var capacity int64 = 1 << 32 // 62 Why is this the max ?
 	fmt.Println(capacity)
 
-	values := core.GenerateRandListG[int8](capacity)
+	values := core.GenerateRandListG[int8](capacity, true)
 	positiveGap, negativeGap := core.CheckDistributionOfPositivesAndNegatiesG[int8](values)
 	fmt.Println("Positives: ", positiveGap)
 	fmt.Println("Negatives: ", negativeGap)

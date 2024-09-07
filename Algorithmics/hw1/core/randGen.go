@@ -17,10 +17,16 @@ type RandStats struct {
 	TimingCoefficientOfVariation float64
 }
 
-func GenerateRandListG[V int8 | int16 | int32 | int64](n int64) []V {
+func GenerateRandListG[V int8 | int16 | int32 | int64](n int64, includeNegatives bool) []V {
 	values := make([]V, n)
 	for i := range values {
-		values[i] = V(mathV2.Int64() << 1)
+		val := V(mathV2.Int64())
+
+		if includeNegatives {
+			val = val << 1
+		}
+
+		values[i] = val
 	}
 	return values
 }
