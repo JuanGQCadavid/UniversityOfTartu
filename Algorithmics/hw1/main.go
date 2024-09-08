@@ -41,8 +41,8 @@ var (
 		int64(math.Pow10(4)),
 		int64(math.Pow10(5)),
 		int64(math.Pow10(6)),
-		// int64(math.Pow10(7)),
-		// int64(math.Pow10(8)),
+		int64(math.Pow10(7)),
+		int64(math.Pow10(8)),
 
 		// Well this one at lest finalized
 		// int64(math.Pow10(9)),
@@ -61,7 +61,7 @@ var (
 func main() {
 	var results = make(map[int64]map[DataType]*RandSResult)
 	for _, tt := range testCases {
-		includeNegatives := false
+		includeNegatives := true
 		fmt.Println(tt)
 		runtime.GC() // We call GC before starting in order to clean the golang memory stack and have more free space
 		results[tt] = runRand(tt, includeNegatives)
@@ -176,7 +176,7 @@ func getSortedKeys(results map[int64]map[DataType]*RandSResult) []int64 {
 	}
 
 	sort.Slice(keys, func(i, j int) bool {
-		return i < j
+		return keys[i] < keys[j]
 	})
 
 	return keys
@@ -189,8 +189,7 @@ func generatePlots(results map[int64]map[DataType]*RandSResult) {
 	chunks := [][]int64{
 		keys,
 		keys[0:1],
-		keys[0 : len(keys)/2],
-		keys[len(keys)/2:],
+		keys[len(keys)-1:],
 	}
 
 	for _, chunk := range chunks {

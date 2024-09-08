@@ -83,26 +83,14 @@ func GenerateLinePlot(title string, xLabel string, yLabel string, points map[str
 	}
 	p.X.AutoRescale = true
 
-	if err := p.Save(4*vg.Inch, 4*vg.Inch, fmt.Sprintf("%s.png", strings.ReplaceAll(title, " ", "_"))); err != nil {
+	if err := p.Save(8*vg.Inch, 4*vg.Inch, fmt.Sprintf("%s.png", strings.ReplaceAll(title, " ", "_"))); err != nil {
 		panic(err)
 	}
 
 }
 
-type BarsData struct {
-	Name   string
-	Groups []BarsGroup
-}
-
-type BarsGroup struct {
-	Name  string
-	Value float64
-}
-
 //
 // There should be one item on dimensionNames per array added to dimensions
-//
-//
 //
 
 func GenerateBarPlot(title string, yLabel string, xNames []string, dimensionNames []string, dimensions ...[]float64) {
@@ -138,7 +126,7 @@ func GenerateBarPlot(title string, yLabel string, xNames []string, dimensionName
 	p.NominalX(xNames...)
 	p.Legend.Top = true
 
-	if err := p.Save(4*vg.Inch, 4*vg.Inch, fmt.Sprintf("%s.png", strings.ReplaceAll(title, " ", "_"))); err != nil {
+	if err := p.Save(6*vg.Inch, 4*vg.Inch, fmt.Sprintf("%s.png", strings.ReplaceAll(title, " ", "_"))); err != nil {
 		panic(err)
 	}
 
