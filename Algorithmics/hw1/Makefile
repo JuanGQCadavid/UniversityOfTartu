@@ -8,3 +8,6 @@ clear:
 
 run-task-4: clear
 	go run cmd/task4/main.go
+
+run-task-lineal-regression: clear
+	go run cmd/task4/main.go

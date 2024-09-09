@@ -1,4 +1,1 @@
-plotting Lib:
-
-https://github.com/gonum/plot/wiki/Example-plots
-go get gonum.org/v1/plot
+All commands are on the MakeFile, run them from the root of the src. 
