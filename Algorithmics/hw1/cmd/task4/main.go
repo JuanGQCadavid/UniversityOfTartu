@@ -15,8 +15,8 @@ var (
 		int64(math.Pow10(4)),
 		int64(math.Pow10(5)),
 		int64(math.Pow10(6)),
-		int64(math.Pow10(7)),
-		int64(math.Pow10(8)),
+		// int64(math.Pow10(7)),
+		// int64(math.Pow10(8)),
 		// int64(math.Pow10(9)),
 	}
 )
@@ -39,8 +39,9 @@ func main() {
 		}
 	}
 
-	core.GeneratePlots(results)
-	core.GenerateSummaryText(results)
+	// core.GeneratePlots(results)
+	// core.GenerateSummaryText(results)
+	core.GenerateFunction(results)
 }
 
 func runRand(n int64, includeNegatives bool) map[core.DataType]*core.RandSResult {

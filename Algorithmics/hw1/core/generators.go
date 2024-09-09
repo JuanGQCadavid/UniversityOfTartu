@@ -7,8 +7,40 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/openacid/slimarray/polyfit"
 	"gonum.org/v1/plot/plotter"
 )
+
+func GenerateFunction(results map[int64]map[DataType]*RandSResult) {
+	keys := getSortedKeys(results)
+	fmt.Printf("%v\n", keys)
+	i8xs, i8ys := make([]float64, len(keys)), make([]float64, len(keys))
+	i64xs, i64ys := make([]float64, len(keys)), make([]float64, len(keys))
+
+	for key, n := range keys {
+		i8xs[key] = float64(n)
+		i64xs[key] = float64(n)
+
+		for dataType, result := range results[n] {
+
+			if dataType == INT8 {
+				i8ys[key] = result.Summary.Timing
+			} else if dataType == INT64 {
+				i64ys[key] = result.Summary.Timing
+			}
+		}
+	}
+
+	fmt.Println(i8xs, i8ys)
+	fmt.Println(i64xs, i64ys)
+
+	f := polyfit.NewFit(i8xs, i8ys, 3)
+	poly := f.Solve()
+
+	fmt.Printf("y = %.1f + %.1fx + %.1fx²\n",
+		poly[0], poly[1], poly[2])
+
+}
 
 func GeneratePlots(results map[int64]map[DataType]*RandSResult) {
 
