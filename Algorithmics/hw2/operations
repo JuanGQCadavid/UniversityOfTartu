@@ -1,0 +1,9 @@
+Operations:
+
+queue:
+    t[ID] enqueue Q[Queue Number], [Message Id]
+    t[ID] dequeue Q[Queue Number]
+
+Stack:
+    t[ID] push S[Stack Number], [Message Id]
+    t[ID] pop S[Stack Number]
