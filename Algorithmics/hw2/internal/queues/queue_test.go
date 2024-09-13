@@ -5,24 +5,195 @@ import (
 	"hw2/internal/domain"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestFailPop(t *testing.T) {
-	stack := NewQueue("1")
+func TestStats(t *testing.T) {
+	var tests = []struct {
+		name          string
+		operations    []domain.Operation
+		statsExpected domain.GeneralStats
+	}{
+		{
+			name: "Insert count check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+			},
+			statsExpected: domain.GeneralStats{
+				InsertCount:  5,
+				DeleteCount:  0,
+				MaxSizeCount: 5,
+				ActualSize:   5,
+				ErrorsCount:  0,
+			},
+		},
+		{
+			name: "Insert and Delete count check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+			},
+			statsExpected: domain.GeneralStats{
+				InsertCount:  3,
+				DeleteCount:  2,
+				MaxSizeCount: 1,
+				ActualSize:   1,
+				ErrorsCount:  0,
+			},
+		},
+		{
+			name: "Max Count count check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+			},
+			statsExpected: domain.GeneralStats{
+				InsertCount:  5,
+				DeleteCount:  2,
+				MaxSizeCount: 3,
+				ActualSize:   3,
+				ErrorsCount:  0,
+			},
+		},
+		{
+			name: "Actual Size check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+			},
+			statsExpected: domain.GeneralStats{
+				InsertCount:  2,
+				DeleteCount:  2,
+				MaxSizeCount: 1,
+				ActualSize:   0,
+				ErrorsCount:  0,
+			},
+		},
+		{
+			name: "Erros check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+			},
+			statsExpected: domain.GeneralStats{
+				InsertCount:  2,
+				DeleteCount:  2,
+				MaxSizeCount: 1,
+				ActualSize:   0,
+				ErrorsCount:  2,
+			},
+		},
+	}
 
-	if _, err := stack.Pop("X"); err != domain.ErrNotItemsToPop {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			queue := NewQueue("1")
+			for index, op := range tt.operations {
+				if op.OpType == domain.INSERT {
+					queue.Push(strconv.Itoa(index), fmt.Sprintf("T%06d", index))
+				} else {
+					queue.Pop(fmt.Sprintf("T%06d", index))
+				}
+			}
+			statsGenerated := queue.GetStats()
+			assert.Equal(t, tt.statsExpected.InsertCount, statsGenerated.InsertCount, "Insert count check")
+			assert.Equal(t, tt.statsExpected.DeleteCount, statsGenerated.DeleteCount, "Delete count check")
+			assert.Equal(t, tt.statsExpected.MaxSizeCount, statsGenerated.MaxSizeCount, "Max count check")
+			assert.Equal(t, tt.statsExpected.ActualSize, statsGenerated.ActualSize, "Actual Size check")
+			assert.Equal(t, tt.statsExpected.ErrorsCount, statsGenerated.ErrorsCount, "Insert count check")
+		})
+	}
+}
+
+func TestFailPop(t *testing.T) {
+	queue := NewQueue("1")
+
+	if _, err := queue.Pop("X"); err != domain.ErrNotItemsToPop {
 		t.Error("Different error was returned, err: ", err.Error(), "expecting: ", domain.ErrNotItemsToPop.Error())
 	}
 
-	stack.Push("X", "X")
+	queue.Push("X", "X")
 
-	if pop, err := stack.Pop("X"); err != nil {
+	if pop, err := queue.Pop("X"); err != nil {
 		t.Error("Error was not expected but it was returned, err: ", err.Error())
 	} else if pop.Id != "X" {
 		t.Error("Id was not Expected, ", pop.Id)
 	}
 
-	if _, err := stack.Pop("X"); err != domain.ErrNotItemsToPop {
+	if _, err := queue.Pop("X"); err != domain.ErrNotItemsToPop {
 		t.Error("Different error was returned, err: ", err.Error(), "expecting: ", domain.ErrNotItemsToPop.Error())
 	}
 }

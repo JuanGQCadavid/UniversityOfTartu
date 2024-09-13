@@ -1,6 +1,9 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type OperationDataType string
 
@@ -39,3 +42,26 @@ type Msg struct {
 var (
 	ErrNotItemsToPop = errors.New("not items left to pop")
 )
+
+type GeneralStats struct {
+	Id           string
+	DataType     OperationDataType
+	ErrorsCount  int
+	InsertCount  int
+	DeleteCount  int
+	MaxSizeCount int
+	ActualSize   int
+}
+
+func (gstats *GeneralStats) ToString() string {
+	return fmt.Sprintf(
+		"Stats: \n\tId: %s \n\tData type: %s \n\tErrorsCount: %06d \n\tInsertCount: %06d \n\tDeleteCount: %06d \n\tMaxSizeCount: %06d \n\tActualSize: %06d",
+		gstats.Id,
+		string(gstats.DataType),
+		gstats.ErrorsCount,
+		gstats.InsertCount,
+		gstats.DeleteCount,
+		gstats.MaxSizeCount,
+		gstats.ActualSize,
+	)
+}

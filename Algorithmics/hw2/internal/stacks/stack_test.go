@@ -5,6 +5,8 @@ import (
 	"hw2/internal/domain"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFailPop(t *testing.T) {
@@ -24,6 +26,178 @@ func TestFailPop(t *testing.T) {
 
 	if _, err := stack.Pop("X"); err != domain.ErrNotItemsToPop {
 		t.Error("Different error was returned, err: ", err.Error(), "expecting: ", domain.ErrNotItemsToPop.Error())
+	}
+}
+
+// type GeneralStats struct {
+// 	ErrorsCount  int
+// 	InsertCount  int
+// 	DeleteCount  int
+// 	MaxSizeCount int
+// 	ActualSize   int
+// }
+
+func TestStats(t *testing.T) {
+	var tests = []struct {
+		name            string
+		operations      []domain.Operation
+		insertCount     int
+		deletecount     int
+		maxSizeCount    int
+		actualSizeCount int
+		errorsCounts    int
+	}{
+		{
+			name: "Insert count check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+			},
+			insertCount:     5,
+			deletecount:     0,
+			maxSizeCount:    5,
+			actualSizeCount: 5,
+			errorsCounts:    0,
+		},
+		{
+			name: "Insert and Delete count check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+			},
+			insertCount:     3,
+			deletecount:     2,
+			maxSizeCount:    1,
+			actualSizeCount: 1,
+			errorsCounts:    0,
+		},
+		{
+			name: "Max Count count check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+			},
+			insertCount:     5,
+			deletecount:     2,
+			maxSizeCount:    3,
+			actualSizeCount: 3,
+			errorsCounts:    0,
+		},
+		{
+			name: "Actual Size check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+			},
+			insertCount:     2,
+			deletecount:     2,
+			maxSizeCount:    1,
+			actualSizeCount: 0,
+			errorsCounts:    0,
+		},
+		{
+			name: "Erros check",
+			operations: []domain.Operation{
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.INSERT,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+				{
+					OpType: domain.REMOVE,
+				},
+			},
+			insertCount:     2,
+			deletecount:     2,
+			maxSizeCount:    1,
+			actualSizeCount: 0,
+			errorsCounts:    2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stack := NewStack("1")
+			for index, op := range tt.operations {
+				if op.OpType == domain.INSERT {
+					stack.Push(strconv.Itoa(index), fmt.Sprintf("T%06d", index))
+				} else {
+					stack.Pop(fmt.Sprintf("T%06d", index))
+				}
+			}
+			statsGenerated := stack.GetStats()
+			assert.Equal(t, tt.actualSizeCount, statsGenerated.ActualSize, "Actual size check")
+			assert.Equal(t, tt.insertCount, statsGenerated.InsertCount, "Insert count check")
+			assert.Equal(t, tt.deletecount, statsGenerated.DeleteCount, "Delete count check")
+			assert.Equal(t, tt.maxSizeCount, statsGenerated.MaxSizeCount, "Max count check")
+			assert.Equal(t, tt.actualSizeCount, statsGenerated.ActualSize, "Actual Size check")
+			assert.Equal(t, tt.errorsCounts, statsGenerated.ErrorsCount, "Insert count check")
+		})
 	}
 }
 

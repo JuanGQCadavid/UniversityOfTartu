@@ -59,4 +59,3 @@ if __name__ == "__main__":
     # Output the generated operations
     for op in operations:
         print(op)
-print("Sup")

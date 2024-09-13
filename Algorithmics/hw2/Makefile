@@ -7,3 +7,5 @@ test-stacks:
 
 test-queues:
 	go test -v ./internal/queues
+
+test-all: test-stacks test-queues
