@@ -30,7 +30,9 @@ type Operation struct {
 type MessageMetadata struct {
 	TimeCreated string
 	TimeDeleted string
-	QueueId     string
+	DeltaTime   int
+	DSId        string
+	DSType      OperationDataType
 }
 
 type Msg struct {
@@ -38,19 +40,26 @@ type Msg struct {
 	NextMsg  *Msg
 	Metadata MessageMetadata
 }
+type MsgStat struct {
+	DataType      OperationDataType
+	DataId        string
+	MeanDeltaTime float64
+	Oldest        *Msg
+	Youngest      *Msg
+}
 
 var (
 	ErrNotItemsToPop = errors.New("not items left to pop")
 )
 
 type GeneralStats struct {
-	Id           string
-	DataType     OperationDataType
-	ErrorsCount  int
-	InsertCount  int
-	DeleteCount  int
-	MaxSizeCount int
-	ActualSize   int
+	Id           string            `csv:"id"`
+	DataType     OperationDataType `csv:"data_id"`
+	ErrorsCount  int               `csv:"errors_count"`
+	InsertCount  int               `csv:"insert_count"`
+	DeleteCount  int               `csv:"delete_count"`
+	MaxSizeCount int               `csv:"max_size"`
+	ActualSize   int               `csv:"actual_size"`
 }
 
 func (gstats *GeneralStats) ToString() string {
@@ -64,4 +73,11 @@ func (gstats *GeneralStats) ToString() string {
 		gstats.MaxSizeCount,
 		gstats.ActualSize,
 	)
+}
+
+type GeneralCSV struct {
+	TotalOperations int `csv:"total_operations"`
+	TotalErrs       int `csv:"total_errs"`
+	TotalInsert     int `csv:"total_insert"`
+	TotalRemove     int `csv:"total_remove"`
 }

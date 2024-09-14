@@ -45,7 +45,8 @@ func (stack *Stack) Push(msgId string, timeCreated string) {
 		Id:      msgId,
 		Metadata: domain.MessageMetadata{
 			TimeCreated: timeCreated,
-			QueueId:     stack.ID,
+			DSId:        stack.ID,
+			DSType:      domain.STACK,
 		},
 	}
 

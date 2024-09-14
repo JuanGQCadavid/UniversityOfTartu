@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"hw2/internal/domain"
 	"hw2/internal/domain/ports"
 	"hw2/internal/generators"
@@ -46,6 +47,9 @@ func main() {
 	}
 
 	response := strings.Split(string(out), "\n")
+	response = response[:len(response)-1] // Deleting last enter
+
+	historial := make([]*domain.Msg, 0)
 
 	for _, strOp := range response {
 		op := generators.GenerateTokens(strOp)
@@ -62,9 +66,45 @@ func main() {
 		}
 
 		if op.OpType == domain.REMOVE {
-			ds.Pop(op.Timing)
+			if msg, err := ds.Pop(op.Timing); err == nil {
+				historial = append(historial, msg)
+			}
+		}
+	}
+
+	lastOperation := generators.GenerateTokens(response[len(response)-1])
+	fmt.Println(lastOperation.Timing)
+	before := len(historial)
+
+	initTiming, err := strconv.Atoi(lastOperation.Timing[1:])
+
+	if err != nil {
+		panic(err)
+	}
+
+	for {
+		before := len(historial)
+		initTiming++
+
+		timeFormarted := fmt.Sprintf("t%d", initTiming)
+		fmt.Println(timeFormarted, initTiming)
+		for datatype := range dataStructures {
+			for _, datastructure := range dataStructures[datatype] {
+				if val, err := datastructure.Pop(timeFormarted); err == nil {
+					historial = append(historial, val)
+				}
+			}
+		}
+
+		if before == len(historial) { // If it does not increase in one iteration it means that there were not more messages leff
+			break
 		}
 
 	}
-	generators.GenerateCSV(dataStructures, len(response)-1)
+
+	fmt.Println(before, len(historial))
+	generators.MessagesStats(historial)
+
+	fmt.Printf("The longest one: %+vn\n", historial[0])
+	fmt.Printf("The youngest one: %+vn\n", historial[len(historial)-1])
 }

@@ -243,7 +243,7 @@ func TestPopPush(t *testing.T) {
 					msgReturned.Id,
 					msgReturned.Metadata.TimeCreated,
 					msgReturned.Metadata.TimeDeleted,
-					msgReturned.Metadata.QueueId,
+					msgReturned.Metadata.DSId,
 				)
 
 				if msgReturned == nil {

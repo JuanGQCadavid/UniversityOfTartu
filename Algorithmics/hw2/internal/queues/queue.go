@@ -44,7 +44,8 @@ func (queue *Queue) Push(msgId string, timeCreated string) {
 		Id: msgId,
 		Metadata: domain.MessageMetadata{
 			TimeCreated: timeCreated,
-			QueueId:     queue.ID,
+			DSId:        queue.ID,
+			DSType:      domain.QUEUE,
 		},
 	}
 
