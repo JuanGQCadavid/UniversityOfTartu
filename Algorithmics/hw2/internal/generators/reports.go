@@ -1,6 +1,7 @@
 package generators
 
 import (
+	"encoding/csv"
 	"fmt"
 	"hw2/internal/domain"
 	"hw2/internal/domain/ports"
@@ -23,9 +24,9 @@ func GenerateCSV(dataStructures map[domain.OperationDataType]map[string]ports.Da
 	writeCSVToFile([]domain.GeneralCSV{general}, generalCSVFileName)
 }
 
-func GenerateMessagesStatsReport(sqsNumber, stackNumber int, msgStats map[string]*domain.MsgStat) {
+func GenerateMessagesStatsReport(sqsNumber, stackNumber int, baseFolder string, msgStats map[string]*domain.MsgStat) {
 	fileName := fmt.Sprintf("%d_sqs_%d_stack_report.csv", sqsNumber, stackNumber)
-	dataToPrint := make([][]string, 0, len(msgStats)+1)
+	dataToPrint := make([][]string, len(msgStats)+1)
 
 	dataToPrint[0] = []string{
 		"Data id",
@@ -38,23 +39,25 @@ func GenerateMessagesStatsReport(sqsNumber, stackNumber int, msgStats map[string
 		"Youngest created time",
 		"Youngest removed time",
 	}
+	index := 1
 
 	for _, msg := range msgStats {
-		dataToPrint = append(dataToPrint, []string{
+		dataToPrint[index] = []string{
 			msg.DataId,
 			string(msg.DataType),
-			fmt.Sprintf("%04f", msg.MeanDeltaTime),
+			fmt.Sprintf("%.2f", msg.MeanDeltaTime),
 			msg.Oldest.Id,
 			msg.Oldest.Metadata.TimeCreated,
 			msg.Oldest.Metadata.TimeDeleted,
 			msg.Youngest.Id,
 			msg.Youngest.Metadata.TimeCreated,
 			msg.Youngest.Metadata.TimeDeleted,
-		})
+		}
+		index++
 
 	}
 
-	StringListToCSV(dataToPrint, fileName)
+	StringListToCSV(dataToPrint, baseFolder, fileName)
 
 }
 
@@ -69,6 +72,20 @@ func writeCSVToFile(data any, fileName string) {
 	}
 }
 
-func StringListToCSV(data [][]string, fileNme string) {
-	// PENDING
+func StringListToCSV(data [][]string, baseFolder, fileNme string) {
+	f, err := os.OpenFile(fmt.Sprint(baseFolder, fileNme), os.O_RDWR|os.O_CREATE, os.ModePerm)
+
+	if err != nil {
+		panic(err)
+	}
+
+	writter := csv.NewWriter(f)
+
+	for _, record := range data {
+		if err := writter.Write(record); err != nil {
+			panic(err)
+		}
+	}
+
+	writter.Flush()
 }

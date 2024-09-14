@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	PYTHON_FILE_NAME = "repositories/base_python_code.py"
+	PYTHON_FILE_NAME    = "repositories/base_python_code.py"
+	BASE_FOLDER_OUTPUTS = "cmd/ex2/results/hw2_"
 )
 
 var (
@@ -103,8 +104,5 @@ func main() {
 	}
 
 	fmt.Println(before, len(historial))
-	generators.MessagesStats(historial)
-
-	fmt.Printf("The longest one: %+vn\n", historial[0])
-	fmt.Printf("The youngest one: %+vn\n", historial[len(historial)-1])
+	generators.GenerateMessagesStatsReport(QUEUE_NUMBER, STACK_NUMBER, BASE_FOLDER_OUTPUTS, generators.MessagesStats(historial))
 }

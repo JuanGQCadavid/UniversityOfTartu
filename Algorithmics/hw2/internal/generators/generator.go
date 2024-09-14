@@ -92,11 +92,11 @@ func MessagesStats(messages []*domain.Msg) map[string]*domain.MsgStat {
 
 	}
 
-	fmt.Println("-----")
+	// fmt.Println("-----")
 
 	for i, msStat := range statsPerDataStructure {
 		msStat.MeanDeltaTime = stat.Mean(deltaValues[i], nil)
-		fmt.Printf("Id: %s, Mean: %f, Oldest: %+v, Young: %+v\n", i, statsPerDataStructure[i].MeanDeltaTime, statsPerDataStructure[i].Oldest, statsPerDataStructure[i].Youngest)
+		// fmt.Printf("Id: %s, Mean: %f, Oldest: %+v, Young: %+v\n", i, statsPerDataStructure[i].MeanDeltaTime, statsPerDataStructure[i].Oldest, statsPerDataStructure[i].Youngest)
 	}
 
 	return statsPerDataStructure
