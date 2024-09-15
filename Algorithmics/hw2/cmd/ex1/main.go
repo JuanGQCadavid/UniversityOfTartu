@@ -13,7 +13,9 @@ import (
 )
 
 const (
-	PYTHON_FILE_NAME = "repositories/base_python_code.py"
+	PYTHON_FILE_NAME   = "repositories/base_python_code.py"
+	generalCSVFileName = "cmd/ex1/results/hw1_general.csv"
+	allCSVFileName     = "cmd/ex1/results/hw1_all.csv"
 )
 
 var (
@@ -66,5 +68,5 @@ func main() {
 		}
 
 	}
-	generators.GenerateCSV(dataStructures, len(response)-1)
+	generators.GenerateCSV(dataStructures, len(response)-1, generalCSVFileName, allCSVFileName)
 }

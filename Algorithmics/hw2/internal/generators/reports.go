@@ -10,14 +10,9 @@ import (
 	"github.com/gocarina/gocsv"
 )
 
-const (
-	generalCSVFileName = "cmd/ex1/results/hw1_general.csv"
-	allCSVFileName     = "cmd/ex1/results/hw1_all.csv"
-)
-
 // Generates two independents csv files, one with general information (Total op, total errs, total insert/delete)
 // And a second csv with more details per data structure
-func GenerateCSV(dataStructures map[domain.OperationDataType]map[string]ports.DataStructure, totalReports int) {
+func GenerateCSV(dataStructures map[domain.OperationDataType]map[string]ports.DataStructure, totalReports int, generalCSVFileName, allCSVFileName string) {
 
 	allStats, general := GetAllStats(dataStructures)
 	writeCSVToFile(allStats, allCSVFileName)
@@ -35,9 +30,11 @@ func GenerateMessagesStatsReport(sqsNumber, stackNumber int, baseFolder string, 
 		"Oldest id",
 		"Oldest created time",
 		"Oldest removed time",
+		"Oldest delta time",
 		"Youngest id",
 		"Youngest created time",
 		"Youngest removed time",
+		"Youngest delta time",
 	}
 	index := 1
 
@@ -49,9 +46,11 @@ func GenerateMessagesStatsReport(sqsNumber, stackNumber int, baseFolder string, 
 			msg.Oldest.Id,
 			msg.Oldest.Metadata.TimeCreated,
 			msg.Oldest.Metadata.TimeDeleted,
+			fmt.Sprint(msg.Oldest.Metadata.DeltaTime),
 			msg.Youngest.Id,
 			msg.Youngest.Metadata.TimeCreated,
 			msg.Youngest.Metadata.TimeDeleted,
+			fmt.Sprint(msg.Youngest.Metadata.DeltaTime),
 		}
 		index++
 

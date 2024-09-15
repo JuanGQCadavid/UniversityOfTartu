@@ -15,7 +15,10 @@ import (
 
 const (
 	PYTHON_FILE_NAME    = "repositories/base_python_code.py"
+	PYTHON_FILE_NAME_v2 = "repositories/base_python_code.py"
 	BASE_FOLDER_OUTPUTS = "cmd/ex2/results/hw2_"
+	generalCSVFileName  = "cmd/ex2/results/hw2_general.csv"
+	allCSVFileName      = "cmd/ex2/results/hw2_all.csv"
 )
 
 var (
@@ -40,7 +43,7 @@ func init() {
 }
 
 func main() {
-	cmd := exec.Command("python3", PYTHON_FILE_NAME, strconv.Itoa(QUEUE_NUMBER), strconv.Itoa(STACK_NUMBER))
+	cmd := exec.Command("python3", PYTHON_FILE_NAME_v2, strconv.Itoa(QUEUE_NUMBER), strconv.Itoa(STACK_NUMBER))
 	out, err := cmd.CombinedOutput()
 
 	if err != nil {
@@ -105,4 +108,5 @@ func main() {
 
 	fmt.Println(before, len(historial))
 	generators.GenerateMessagesStatsReport(QUEUE_NUMBER, STACK_NUMBER, BASE_FOLDER_OUTPUTS, generators.MessagesStats(historial))
+	generators.GenerateCSV(dataStructures, len(response)-1, generalCSVFileName, allCSVFileName)
 }
