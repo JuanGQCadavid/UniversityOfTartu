@@ -1,0 +1,17 @@
+# Quicksort original, 100000, 0.14285699526468912
+# Quicksort Mediam of three, 100000, 0.12375044822692871
+# Quicksort V3. Recursived, 100000, 0.1597449779510498
+# Quicksort V. stacks, 100000, 0.13883471488952637
+# Quicksort V. stacks and Updated, 100000, 0.2109996477762858
+
+# Quicksort original, 1000000, 1.625165065129598
+# Quicksort Mediam of three, 1000000, 1.5709857145945232
+# Quicksort V3. Recursived, 1000000, 2.108337640762329
+# Quicksort V. stacks, 1000000, 1.800886074701945
+# Quicksort V. stacks and Updated, 1000000, 2.7969484329223633
+
+# Quicksort original, 10000000, 21.230446974436443
+# Quicksort Mediam of three, 10000000, 19.800551255544026
+# Quicksort V3. Recursived, 10000000, 28.795310338338215
+# Quicksort V. stacks, 10000000, 23.544198592503864
+# Quicksort V. stacks and Updated, 10000000, 35.344576915105186

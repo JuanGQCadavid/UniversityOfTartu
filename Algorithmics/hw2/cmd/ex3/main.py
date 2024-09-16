@@ -1,28 +1,33 @@
 import random
 import time
-import sys
+import matplotlib.pyplot as plt
 
-sys.setrecursionlimit(1500)
+# sys.setrecursionlimit(1500)
 
-# Generate a list of random numbers
-rnumbers = random.sample(range(1, 10**8), 10**6)
-# rnumbers = random.sample(range(1, 10**8), 10**3) # small data for initial test
-snumbers = rnumbers.copy()
-snumbers.sort()
+def timeMesure(testName, funct, nSize):
+        rnumbers = random.sample(range(1, 10**8), nSize)
+        snumbers = rnumbers.copy()
+        snumbers.sort()
+        print(testName)
 
-def timeMesure(testName, funct):
-   print(testName)
-   for i in range(3):
-    numbers = rnumbers.copy()
-    start_time = time.time()
-    funct( numbers, 0, len(numbers)-1 )
-    end_time = time.time()
-    print(f"Time to sort {len(numbers)} elements: {end_time - start_time:.2f} seconds")
-    if numbers == snumbers:
-        pass
-        print("OK - was correct")
-    else:
-        print("Error: code was wrong")
+        avg = 0
+        for i in range(3):
+            numbers = rnumbers.copy()
+            start_time = time.time()
+            funct( numbers, 0, len(numbers)-1 )
+            end_time = time.time()
+
+            print(f"Time to sort {len(numbers)} elements: {end_time - start_time:.2f} seconds")
+
+            avg += end_time - start_time
+
+            if numbers == snumbers:
+                pass
+                print("OK - was correct")
+            else:
+                print("Error: code was wrong")
+        
+        return avg/3
 
 def quickSortV3VStack(arr, low, high):
     operations = []
@@ -175,8 +180,69 @@ def quickSortMediamOfThree(arr, low, high):
     quickSortMediamOfThree(arr, low, pi - 1)
     quickSortMediamOfThree(arr, pi + 1, high)
 
-timeMesure("# Quicksort original", quickSort)
-timeMesure("# Quicksort Mediam of three", quickSortMediamOfThree)
-timeMesure("# Quicksort V3. Recursived", quickSortV3)
-timeMesure("# Quicksort V. stacks", quickSortVStack)
-timeMesure("# Quicksort V. stacks and Updated", quickSortV3VStack)
+
+
+
+cases = [10**5, 10**6, 10**7]
+# cases = [10**1, 10**2, 10**3]
+
+methods = [
+    (
+       "Quicksort original", quickSort 
+    ),
+    (
+       "Quicksort mediam of three", quickSortMediamOfThree
+    ),
+    (
+       "Quicksort pivot starting from the left", quickSortV3
+    ),
+    (
+       "Quicksort with stacks", quickSortVStack
+    ),
+    (
+       "Quicksort with stacks and from the left", quickSortV3VStack
+    ),
+]
+
+f = open("results_3.txt", "a")
+to_plot_xs = {}
+to_plot_ys = {}
+to_plot_names = {}
+for case in cases:
+    for method in methods:
+        timeAvg = timeMesure(method[0],method[1], case)
+        print(f"Time to sort {case} elements in avg: {timeAvg:.2f} seconds\n")
+        f.write(f"{method[0]}, {case}, {timeAvg}\n")
+
+        if method[0] not in to_plot_xs:
+            to_plot_xs[method[0]] = []  
+        if method[0] not in to_plot_ys:
+            to_plot_ys[method[0]] = [] 
+        if method[0] not in to_plot_names:
+            to_plot_names[method[0]] = method[0] 
+
+        print(method[0])
+        print(len(to_plot_xs))
+
+        to_plot_xs[method[0]].append(case) 
+        to_plot_ys[method[0]].append(timeAvg) 
+        
+
+f.close()
+
+for key in to_plot_names:
+    plt.plot(to_plot_xs[key], to_plot_ys[key], label = to_plot_names[key])
+plt.title('N size vs Time for multiple quicksort implementations')
+plt.xlabel('N size')
+plt.ylabel('Time in seconds')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+    
+
+    # timeMesure("# Quicksort original", quickSort)
+    # timeMesure("# Quicksort Mediam of three", quickSortMediamOfThree)
+    # timeMesure("# Quicksort V3. Recursived", quickSortV3)
+    # timeMesure("# Quicksort V. stacks", quickSortVStack)
+    # timeMesure("# Quicksort V. stacks and Updated", quickSortV3VStack)
