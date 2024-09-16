@@ -204,7 +204,7 @@ methods = [
     ),
 ]
 
-f = open("results_3.txt", "a")
+f = open("results.txt", "a")
 to_plot_xs = {}
 to_plot_ys = {}
 to_plot_names = {}
@@ -238,11 +238,3 @@ plt.ylabel('Time in seconds')
 plt.legend()
 plt.grid(True)
 plt.show()
-
-    
-
-    # timeMesure("# Quicksort original", quickSort)
-    # timeMesure("# Quicksort Mediam of three", quickSortMediamOfThree)
-    # timeMesure("# Quicksort V3. Recursived", quickSortV3)
-    # timeMesure("# Quicksort V. stacks", quickSortVStack)
-    # timeMesure("# Quicksort V. stacks and Updated", quickSortV3VStack)
