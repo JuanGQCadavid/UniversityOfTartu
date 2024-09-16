@@ -5,8 +5,8 @@ import sys
 sys.setrecursionlimit(1500)
 
 # Generate a list of random numbers
-# rnumbers = random.sample(range(1, 10**8), 10**6)
-rnumbers = random.sample(range(1, 10**2), 10**1) # small data for initial test
+rnumbers = random.sample(range(1, 10**8), 10**6)
+# rnumbers = random.sample(range(1, 10**8), 10**3) # small data for initial test
 snumbers = rnumbers.copy()
 snumbers.sort()
 
@@ -23,7 +23,6 @@ def timeMesure(testName, funct):
         print("OK - was correct")
     else:
         print("Error: code was wrong")
-        print(numbers)
 
 def quickSortV3VStack(arr, low, high):
     operations = []
@@ -149,7 +148,7 @@ def quickSort(arr, low, high):
     quickSort(arr, pi+1, high)
 
 def median_of_three(arr, low, high):
-    mid = (high - low) // 2
+    mid = low + (high - low) // 2
 
     if arr[low] > arr[mid]:
         arr[low], arr[mid] = arr[mid], arr[low]
@@ -160,33 +159,32 @@ def median_of_three(arr, low, high):
     if arr[mid] > arr[high]:
         arr[mid], arr[high] = arr[high], arr[mid]
     
-    if (high - low) >= 2:
-        arr[mid], arr[high-1] = arr[high-1], arr[mid]
+    # Move the pivot to the second-to-last position to partition easily
+    arr[mid], arr[high-1] = arr[high-1], arr[mid]
 
-    return low +1, high-1,  arr[high-1]
-
+    return arr[high-1]  # Return the pivot value
 
 def quickSortMediamOfThree(arr, low, high):
-    if (high <= low) : return
-
-    i, j, pivot = median_of_three(arr, low, high)     # pivot
-
-    while( i <= j ) :
+    if high <= low:
+        return
+    pivot = median_of_three(arr, low, high)
+    i = low
+    j = high - 2  # Since pivot is at high-1
+    while i <= j:
         if arr[i] < pivot:
-            i = i+1
-        else :
+            i += 1
+        else:
             arr[i], arr[j] = arr[j], arr[i]
-            j = j-1
+            j -= 1
+    # Place pivot in its correct position
     pi = i
-    arr[pi], arr[high] = arr[high], arr[pi]
+    arr[pi], arr[high-1] = arr[high-1], arr[pi]
+    quickSortMediamOfThree(arr, low, pi - 1)
+    quickSortMediamOfThree(arr, pi + 1, high)
 
-    quickSort(arr, low, pi-1)
-    quickSort(arr, pi+1, high)
 
-
-# timeMesure("# Quicksort original", quickSort)
-print(rnumbers)
+timeMesure("# Quicksort original", quickSort)
 timeMesure("# Quicksort Mediam of three", quickSortMediamOfThree)
-# timeMesure("# Quicksort V3. Recursived", quickSortV3)
-# timeMesure("# Quicksort V. stacks", quickSortVStack)
-# timeMesure("# Quicksort V. stacks and Updated", quickSortV3VStack)
+timeMesure("# Quicksort V3. Recursived", quickSortV3)
+timeMesure("# Quicksort V. stacks", quickSortVStack)
+timeMesure("# Quicksort V. stacks and Updated", quickSortV3VStack)
