@@ -7,19 +7,3 @@ queue:
 Stack:
     t[ID] push S[Stack Number], [Message Id]
     t[ID] pop S[Stack Number]
-
-
-
-Id: S1, Oldest: &{Id:22 NextMsg:<nil> Metadata:{TimeCreated:t00027 TimeDeleted:t11075 DeltaTime:11048 DSId:1 DSType:S}}, Young: &{Id:2362 NextMsg:0x1400022fe00 Metadata:{TimeCreated:t01499 TimeDeleted:t01500 DeltaTime:1 DSId:1 DSType:S}}
-Id: S2, Oldest: &{Id:1045 NextMsg:<nil> Metadata:{TimeCreated:t00843 TimeDeleted:t11393 DeltaTime:10550 DSId:2 DSType:S}}, Young: &{Id:21065 NextMsg:0x14000613800 Metadata:{TimeCreated:t06682 TimeDeleted:t06683 DeltaTime:1 DSId:2 DSType:S}}
-Id: S3, Oldest: &{Id:4 NextMsg:<nil> Metadata:{TimeCreated:t00004 TimeDeleted:t12121 DeltaTime:12117 DSId:3 DSType:S}}, Young: &{Id:20276 NextMsg:0x140005ae960 Metadata:{TimeCreated:t06475 TimeDeleted:t06476 DeltaTime:1 DSId:3 DSType:S}}
-
-
-Id: Q1, Oldest: &{Id:17061 NextMsg:0x140001f69c0 Metadata:{TimeCreated:t05672 TimeDeleted:t10001 DeltaTime:4329 DSId:1 DSType:Q}}, Young: &{Id:11 NextMsg:<nil> Metadata:{TimeCreated:t00018 TimeDeleted:t00020 DeltaTime:2 DSId:1 DSType:Q}}
-Id: Q2, Oldest: &{Id:17337 NextMsg:0x14000221140 Metadata:{TimeCreated:t05743 TimeDeleted:t10001 DeltaTime:4258 DSId:2 DSType:Q}}, Young: &{Id:7 NextMsg:<nil> Metadata:{TimeCreated:t00008 TimeDeleted:t00009 DeltaTime:1 DSId:2 DSType:Q}}
-Id: Q3, Oldest: &{Id:17758 NextMsg:0x1400025cf60 Metadata:{TimeCreated:t05842 TimeDeleted:t10002 DeltaTime:4160 DSId:3 DSType:Q}}, Young: &{Id:121 NextMsg:<nil> Metadata:{TimeCreated:t00133 TimeDeleted:t00134 DeltaTime:1 DSId:3 DSType:Q}}
-Id: Q4, Oldest: &{Id:20167 NextMsg:0x140003d8660 Metadata:{TimeCreated:t06450 TimeDeleted:t10000 DeltaTime:3550 DSId:4 DSType:Q}}, Young: &{Id:178 NextMsg:<nil> Metadata:{TimeCreated:t00205 TimeDeleted:t00206 DeltaTime:1 DSId:4 DSType:Q}}
-Id: Q5, Oldest: &{Id:20683 NextMsg:0x140005e0c60 Metadata:{TimeCreated:t06586 TimeDeleted:t10001 DeltaTime:3415 DSId:5 DSType:Q}}, Young: &{Id:9 NextMsg:<nil> Metadata:{TimeCreated:t00013 TimeDeleted:t00014 DeltaTime:1 DSId:5 DSType:Q}}
-
-The longest one: &{Id:4 NextMsg:<nil> Metadata:{TimeCreated:t00004 TimeDeleted:t12121 DeltaTime:12117 DSId:3 DSType:S}}n
-The youngest one: &{Id:7 NextMsg:<nil> Metadata:{TimeCreated:t00008 TimeDeleted:t00009 DeltaTime:1 DSId:2 DSType:Q}}n
