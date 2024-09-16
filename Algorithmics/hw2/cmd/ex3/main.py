@@ -105,7 +105,6 @@ def quickSortVStack(arr, low, high):
             "high": pi-1
         })
 
-
 def quickSortV3(arr, low, high):
     if (high <= low) : return
 
@@ -119,15 +118,10 @@ def quickSortV3(arr, low, high):
             yellow = yellow + 1
             if green > yellow :
                 arr[yellow], arr[green] = arr[green], arr[yellow]
-        # print(arr, 'Green at: ', green, 'yellow at:', yellow)
-    # return
     pi = yellow
     quickSortV3(arr, low, pi-1)
     quickSortV3(arr, pi+1, high)
 
-# arr = [3,2,5,0,1,8,7,6,9,4]
-# quickSortV3(arr=arr, low=0, high=len(arr)-1)
-# print(arr)
 def quickSort(arr, low, high):
     if (high <= low) : return
 
@@ -158,8 +152,7 @@ def median_of_three(arr, low, high):
 
     if arr[mid] > arr[high]:
         arr[mid], arr[high] = arr[high], arr[mid]
-    
-    # Move the pivot to the second-to-last position to partition easily
+
     arr[mid], arr[high-1] = arr[high-1], arr[mid]
 
     return arr[high-1]  # Return the pivot value
@@ -181,7 +174,6 @@ def quickSortMediamOfThree(arr, low, high):
     arr[pi], arr[high-1] = arr[high-1], arr[pi]
     quickSortMediamOfThree(arr, low, pi - 1)
     quickSortMediamOfThree(arr, pi + 1, high)
-
 
 timeMesure("# Quicksort original", quickSort)
 timeMesure("# Quicksort Mediam of three", quickSortMediamOfThree)
