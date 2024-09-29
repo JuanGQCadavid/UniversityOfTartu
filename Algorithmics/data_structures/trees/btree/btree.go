@@ -132,14 +132,15 @@ func (btree *BTree[K]) InsertValue(value K, node *BNode[K]) {
 	}
 
 	if sum > 0 {
-		index := len(node.Values)
-		for i, val := range node.Values {
-			if value < val {
-				index = i
-			}
-		}
+		insertIndex := sort.Search(len(node.Values), func(i int) bool { return value < node.Values[i] })
+		// index := len(node.Values)
+		// for i, val := range node.Values {
+		// 	if value < val {
+		// 		index = i
+		// 	}
+		// }
 		// Lets go to the node That would have me
-		btree.InsertValue(value, node.Pointers[index])
+		btree.InsertValue(value, node.Pointers[insertIndex])
 		return
 	} else if len(node.Values) < btree.MaxValues { // Well, It seems I'm the bottom, could I hold the new value?
 		// Yes! I have space, just add it here in sorted way
@@ -175,6 +176,9 @@ func (btree *BTree[K]) NewBNode() *BNode[K] {
 
 func (btree *BTree[K]) Rebalancing(value K, node *BNode[K]) {
 	log.Printf("Rebalancing: %+v", node)
+	if node.Parent != nil {
+		log.Println(" Parent: ", node.Parent.Values)
+	}
 	newNode := btree.NewBNode()
 
 	valuesToSplit := make([]K, 0, btree.MaxValues+1)
@@ -192,6 +196,18 @@ func (btree *BTree[K]) Rebalancing(value K, node *BNode[K]) {
 	newNode.Values = valuesToSplit[midIndex+1:]
 
 	log.Println("OldNode: ", node.Values, " Mid: ", midValue, " NewNode: ", newNode.Values)
+
+	// Manage pointers: move half of the pointers to the new node if it's an internal node
+	if len(node.Pointers) > 0 {
+		placeHolder := make([]*BNode[K], 0, btree.PointersPerNode)
+
+		for i := 0; i < btree.PointersPerNode; i++ {
+			placeHolder = append(placeHolder, nil)
+		}
+
+		newNode.Pointers = append(node.Pointers[midIndex+1:], placeHolder...)[:btree.PointersPerNode]
+		node.Pointers = append(node.Pointers[:midIndex+1], placeHolder...)[:btree.PointersPerNode] //node.Pointers[:midIndex+1]
+	}
 
 	// Well, it seems we are on the root, so a new root would be created
 	if node.Parent == nil {
@@ -220,38 +236,20 @@ func (btree *BTree[K]) Rebalancing(value K, node *BNode[K]) {
 	// Does the root have space to insert a new value?
 	if len(parent.Values) < btree.MaxValues { // Yes it has!
 		log.Println("*****************************************************Hola?")
+		// Mid index
+		insertIndex := sort.Search(len(parent.Values), func(i int) bool { return midValue < parent.Values[i] })
 
-		index := len(parent.Values)
+		// Parent new values
+		parent.Values = append(parent.Values[:insertIndex], append([]K{midValue}, parent.Values[insertIndex:]...)...)
 
-		for i, val := range parent.Values {
-			if value < val {
-				index = i
-				break
-			}
-		}
+		// Parent new pointes
+		parent.Pointers = append(parent.Pointers[:insertIndex+1], append([]*BNode[K]{newNode}, parent.Pointers[insertIndex+1:]...)...)[:btree.PointersPerNode]
 
-		if index == 0 {
-			index = 1
-		}
-
-		// insertIndex := sort.Search(len(parent.Values), func(i int) bool { return midValue < parent.Values[i] })
-
-		left, rigth := parent.Values[0:index], parent.Values[index:]
-		newValues := make([]K, 0, btree.MaxValues)
-		newValues = append(newValues, left...)
-		newValues = append(newValues, value)
-		newValues = append(newValues, rigth...)
-
-		parent.Values = newValues
+		// New node parent addition
 		newNode.Parent = node.Parent
-
-		leftP, rigthP := parent.Pointers[0:index], parent.Pointers[index:]
-		newPointers := make([]*BNode[K], 0, btree.PointersPerNode)
-		newPointers = append(newPointers, leftP...)
-		newPointers = append(newPointers, newNode)
-		newPointers = append(newPointers, rigthP...)
-		parent.Pointers = newPointers[:btree.PointersPerNode]
 	} else {
+		parent.Pointers = append(parent.Pointers, newNode)
+		newNode.Parent = node.Parent
 		log.Println("Parent is full, rebalance needed")
 		btree.Rebalancing(midValue, parent)
 	}
