@@ -40,6 +40,7 @@ type Msg struct {
 	NextMsg  *Msg
 	Metadata MessageMetadata
 }
+
 type MsgStat struct {
 	DataType      OperationDataType
 	DataId        string
