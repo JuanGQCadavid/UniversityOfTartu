@@ -11,7 +11,7 @@ NULL = 0  # Using 0 as null
 
 # Initialize the tree array
 def initialize_tree(size=1001):
-    tree = [[0, 0, 0, 0, ''] for _ in range(size)]  # Initialize with 1001 nodes (index 0 + 1000 free nodes)
+    tree = [[0, 0, 0, 0, 'black'] for _ in range(size)]  # Initialize with 1001 nodes (index 0 + 1000 free nodes)
     tree[0][LEFT] = NULL  # Root starts as empty (0)
     tree[0][RIGHT] = 1  # Free list starts at node 1
     tree[0][PARENT] = NULL  # Free list starts at node 1
@@ -36,22 +36,101 @@ def allocate_node(tree):
 
 
 def check_insert(tree, node, index):
-    # First check, Am i the root?
     print(node)
-    if node[PARENT] == NULL: # is root
-        print("I was checked")
+    changed = False
+    if node[PARENT] == NULL and node[COLOR] == 'red': # Case 0
+        changed = True
+        print(f"Case 0")
         node[COLOR] = 'black'
         tree[index] = node
         return
-    parent = tree[node[PARENT]]
-    grandparent = tree[parent[PARENT]]
+    parent, parent_index = tree[node[PARENT]], node[PARENT]
+    print(f"Parent: {parent}")
+    grandparent, grandparent_index = tree[parent[PARENT]], parent[PARENT]
+    print(f"Grandparent: {grandparent}")
     uncle = None
-    if grandparent[LEFT] == parent:
+    if grandparent[LEFT] == tree[index][PARENT]:
         uncle = tree[grandparent[RIGHT]]
     else:
         uncle = tree[grandparent[LEFT]]
-    
-            
+    uncle_index = grandparent[LEFT] if grandparent[RIGHT] == parent_index else grandparent[RIGHT]
+    print(f"Uncle: {uncle}")
+    if uncle[COLOR] == 'red': # Case 1
+        changed = True
+        print(f"Case 1")
+        parent[COLOR] = 'black'
+        uncle[COLOR] = 'black'
+    else: # Case 2 and 3, black uncle
+        if parent[COLOR] != 'red':
+            return False
+         
+        if parent[RIGHT] == index and parent[LEFT] == NULL and grandparent[LEFT] == parent_index: # rotate right
+            print(f"Case 2, left pyramid")
+            changed = True
+            grandparent[LEFT] = index
+            parent[RIGHT] = NULL
+            parent[PARENT] = index
+            node[LEFT] = parent_index
+            node[PARENT] = grandparent_index
+        
+        elif parent[LEFT] == index and parent[RIGHT] == NULL and grandparent[RIGHT] == parent_index: # rotate left
+            print(f"Case 2, right pyramid")
+            changed = True
+            grandparent[RIGHT] = index
+            parent[LEFT] = NULL
+            parent[PARENT] = index
+            node[RIGHT] = parent_index
+            node[PARENT] = grandparent_index
+
+        # Case 3
+        elif parent[LEFT] == index and grandparent[LEFT] == parent_index:
+            print(f"Case 3, left line")
+            changed = True
+            grand_grandparent, grand_grandparent_index  = tree[grandparent[PARENT]], grandparent[PARENT]
+            sibling, sibling_index = tree[parent[RIGHT]], parent[RIGHT]
+            print(f"Sibling: {sibling}")
+            print(f"Grand_grandparent: {grand_grandparent}")
+            grand_grandparent[RIGHT] = parent_index
+            parent[PARENT] = grand_grandparent_index
+            grandparent[LEFT] = sibling_index
+            sibling[PARENT] = grandparent_index
+            parent[RIGHT] = grandparent_index
+            grandparent[PARENT] = parent_index
+            if parent[COLOR] == 'red':
+                parent[COLOR] = 'black'
+            if grandparent[COLOR] == 'black':
+                grandparent[COLOR] = 'red'
+
+        elif parent[RIGHT] == index and grandparent[RIGHT] == parent_index:
+            print(f"Case 3, right line")
+            grand_grandparent, grand_grandparent_index = tree[grandparent[PARENT]], grandparent[PARENT]
+            sibling, sibling_index = tree[parent[LEFT]], parent[LEFT]
+            grand_grandparent[LEFT] = parent_index
+            parent[PARENT] = grand_grandparent_index
+            grandparent[RIGHT] = sibling_index
+            sibling[PARENT] = grandparent_index
+            parent[LEFT] = grandparent_index
+            grandparent[PARENT] = parent_index
+            if parent[COLOR] == 'red':
+                parent[COLOR] = 'black'
+            else:
+                parent[COLOR] = 'red'
+            if grandparent[COLOR] == 'black':
+                grandparent[COLOR] = 'red'
+            else:
+                grandparent[COLOR] = 'red'
+    return changed
+
+
+def check_tree(tree):
+    changed = True
+    while changed:
+        changed = False
+        for i in range(1, len(tree)):
+            check = check_insert(tree, tree[i], i)
+            if check:
+                changed = True
+                break
         
         
 # Insert a new node into the tree
@@ -82,6 +161,8 @@ def insert_node(tree, value, color='red'):
                 else:
                     current = tree[current][RIGHT]
     check_insert(tree, tree[new_node], new_node)
+    check_tree(tree)
+    # visualize_tree(tree) uncomment to visualize the tree after each insertion
     
 
 # In-order traversal to display the tree
@@ -101,6 +182,7 @@ def preorder_traversal(tree, node):
     preorder_traversal(tree, tree[node][RIGHT])
 
 # Visualization function using networkx with hierarchical tree layout
+
 def visualize_tree(tree):
     G = nx.DiGraph()  # Directed graph for tree
     root = tree[0][LEFT]
@@ -123,24 +205,33 @@ def visualize_tree(tree):
     # Start adding edges from the root
     add_edges(root)
 
-    # Get colors for nodes based on their color attribute
-    node_colors = ['gray' if tree[node][COLOR] == 'black' else 'lightcoral' if tree[node][COLOR] == 'red' else tree[node][COLOR] for node in range(1, len(tree)) if tree[node][INFO] != 0]
+    # Get colors for nodes based on their color attribute, not on pos order
+    node_colors = []
+    for key in pos.keys():
+        for node in tree:
+            if node[INFO] == key and node[INFO] != NULL:
+                if node[COLOR] == 'red':
+                    node_colors.append('lightcoral')
+                else:
+                    node_colors.append('grey')
+                    break
+
 
     # Draw the tree with specified positions
     nx.draw(G, pos, with_labels=True, node_size=500, node_color=node_colors, font_size=10, font_weight="bold", arrows=True)
     plt.savefig("red_black_tree.png")
     plt.show()
 
+
 ct = initialize_tree()
 
 def next_collatz(n):
     return n // 2 if n % 2 == 0 else 3 * n + 1
 
-n = 3
-insert_node(ct, n, 'red')
-while n>1 :
-  n = next_collatz(n)
-  insert_node(ct, n, 'red')
-
-preorder_traversal(ct, ct[0][LEFT])
+# collatz of 51 array
+n = [3, 5, 9, 2, 4, 7, 1, 8, 6]
+for val in n:
+    insert_node(ct, val)
+    print(f"Inserted {val}")
+    print("")
 visualize_tree(ct)

@@ -19,12 +19,44 @@ func nextCollatz(n int) int {
 }
 
 func main() {
-	// printString()
-	visualize()
+	// start := 7
+	// visualize(start)
+	// printString(start)
+
+	wouldItWork()
 }
 
-func visualize() {
-	start := 51
+func wouldItWork() {
+	nodesToAppend := []int{
+		-10, 8, -1, -20, -30, 9, 1, 5,
+	}
+	bst := binarysearch.NewBSTree[int, int]()
+	for _, node := range nodesToAppend {
+		bst.Append(node, node)
+	}
+
+	sumL, nodesL := search.MaximunPathSum(bst.Root.Left)
+	sumR, nodesR := search.MaximunPathSum(bst.Root.Rigth)
+	log.Println("sumL:", sumL)
+	log.Println("sumR:", sumR)
+	log.Println("Total Sum: ", sumL+sumR+bst.Root.SatalliteData)
+
+	totalNodes := make([]*domain.Node[int, int], 0, len(nodesL)+len(nodesR)+1)
+
+	totalNodes = append(totalNodes, nodesL...)
+	totalNodes = append(totalNodes, bst.Root)
+	totalNodes = append(totalNodes, nodesR...)
+
+	root := BuildNewTreeFromSubtree(totalNodes)
+
+	fileName := "ex2.csv"
+	result := visualizer.FromTreeToMatrix(root, len(totalNodes))
+	visualizer.FromMatrixToFile(result, fileName)
+	visualizer.FromCSVToImage(fileName)
+
+}
+
+func visualize(start int) {
 	results := make([]int, 10)
 	bst := binarysearch.NewBSTree[int, int]()
 	for n := start; n > 1; n = nextCollatz(n) {
@@ -53,8 +85,7 @@ func visualize() {
 	visualizer.FromCSVToImage(fileName)
 }
 
-func printString() {
-	start := 51
+func printString(start int) {
 	results := make([]int, 10)
 	bst := binarysearch.NewBSTree[int, int]()
 	for n := start; n > 1; n = nextCollatz(n) {
