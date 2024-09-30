@@ -8,3 +8,6 @@ run-ex1: clear
 
 run-ex2: clear
 	go run cmd/ex2/main.go
+
+run-ex4: clear
+	go run cmd/ex4/main.go

@@ -63,7 +63,7 @@ def check_insert(tree, node, index):
     else: # Case 2 and 3, black uncle
         if parent[COLOR] != 'red':
             return False
-         
+                 
         if parent[RIGHT] == index and parent[LEFT] == NULL and grandparent[LEFT] == parent_index: # rotate right
             print(f"Case 2, left pyramid")
             changed = True
