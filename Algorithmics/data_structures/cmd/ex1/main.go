@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	start := 51
+	start := 7
 	results := make([]int, 10)
 	bst := binarysearch.NewBSTree[int, int]()
 	for n := start; n > 1; n = nextCollatz(n) {

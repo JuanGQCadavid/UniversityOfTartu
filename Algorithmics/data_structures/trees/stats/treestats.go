@@ -9,10 +9,7 @@ func GetDepth[K constraints.Ordered, D any](node *domain.Node[K, D]) int {
 	if node == nil {
 		return 0
 	}
-
-	left := GetDepth(node.Left)
-	rigth := GetDepth(node.Rigth)
-
+	left, rigth := GetDepth(node.Left), GetDepth(node.Rigth)
 	if left > rigth {
 		return left + 1
 	}
