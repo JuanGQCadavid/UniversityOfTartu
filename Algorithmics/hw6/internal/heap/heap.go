@@ -74,7 +74,6 @@ func (h *Heap[T]) MaxHeapify(i int) {
 		log.Println("Swap")
 		log.Println(h.data[i], h.data[largest])
 		h.data[i], h.data[largest] = h.data[largest], h.data[i]
-		log.Println(h.data[i], h.data[largest])
 		h.MaxHeapify(largest)
 	}
 }
@@ -95,4 +94,16 @@ func (h *Heap[T]) left(i int) int {
 func (h *Heap[T]) right(i int) int {
 	// K - i*k + 1
 	return i*h.k + 1
+}
+
+func (h *Heap[T]) HeapSort(n int) {
+	h.heapSize = n
+	h.BuildMaxHeap(n)
+
+	for i := h.heapSize; i > 1; i-- {
+		log.Println("HeapSort: ", i, h.data[i])
+		h.data[1], h.data[i] = h.data[i], h.data[1]
+		h.heapSize = h.heapSize - 1
+		h.MaxHeapify(1)
+	}
 }
