@@ -33,13 +33,17 @@ func (h *Heap[T]) GetData() []T {
 	return h.data
 }
 
+func (h *Heap[T]) GetHeapSize() int {
+  return len(h.data)
+} 
+
 func (h *Heap[T]) BuildMaxHeap(n int) {
 	h.heapSize = n
 	log.Println("heap size: ", h.heapSize)
-	log.Println("Data size: ", len(h.data))
+	log.Println("data size: ", len(h.data))
 
 	for i := h.heapSize / h.k; i >= 0; i-- {
-		log.Println("Analyzing: ", i, h.data[i])
+		//log.Println("Analyzing: ", i, h.data[i])
 		h.MaxHeapify(i)
 	}
 }
@@ -51,26 +55,26 @@ func (h *Heap[T]) MaxHeapify(i int) {
 		largest    = i
 	)
 
-	log.Println("------ ", i, h.data[i], " ------")
+	//log.Println("------ ", i, h.data[i], " ------")
 
 	if leftLimit <= h.heapSize {
-		log.Println("left limit: ", leftLimit, h.data[leftLimit])
+		//log.Println("left limit: ", leftLimit, h.data[leftLimit])
 	} else {
-		log.Println("left limit is out of range")
+		//log.Println("left limit is out of range")
 		return
 	}
 
 	if rightLimit <= h.heapSize {
-		log.Println("right limit: ", rightLimit, h.data[rightLimit])
+		//log.Println("right limit: ", rightLimit, h.data[rightLimit])
 	} else {
-		log.Println("right limit is out of range, as the left is inside range, then setting to the upper limit heap size")
+		//log.Println("right limit is out of range, as the left is inside range, then setting to the upper limit heap size")
 		rightLimit = h.heapSize
 	}
 
 	for index := leftLimit; index <= rightLimit; index++ {
-		log.Println(index, h.data[index], "VS", h.data[largest])
+		//log.Println(index, h.data[index], "VS", h.data[largest])
 		if h.data[index] > h.data[largest] {
-			log.Println(h.data[index], ">", h.data[largest])
+			//log.Println(h.data[index], ">", h.data[largest])
 			largest = index
 		}
 
@@ -78,10 +82,10 @@ func (h *Heap[T]) MaxHeapify(i int) {
 
 	// time.Sleep(1 * time.Second)
 	if largest != i {
-		log.Println("Swap")
-		log.Println(h.data[i], h.data[largest])
+		//log.Println("Swap")
+		//log.Println(h.data[i], h.data[largest])
 		h.data[i], h.data[largest] = h.data[largest], h.data[i]
-		log.Println("Done")
+		//log.Println("Done")
 		h.MaxHeapify(largest)
 	}
 }
@@ -111,7 +115,7 @@ func (h *Heap[T]) HeapSort(n int) {
 	h.BuildMaxHeap(n)
 
 	for i := h.heapSize; i > 0; i-- {
-		log.Println("HeapSort: ", i, h.data[i])
+		// log.Println("HeapSort: ", i, h.data[i])
 		h.data[0], h.data[i] = h.data[i], h.data[0]
 		h.heapSize = h.heapSize - 1
 		h.MaxHeapify(0)
