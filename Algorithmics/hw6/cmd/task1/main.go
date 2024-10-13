@@ -10,16 +10,16 @@ import (
 )
 
 const (
-	upperLimit     int = 999999999
-	maxValuesSizes int = 10000 //1000000
+	upperLimit int = 999999999
+	// maxValuesSizes int = 1000000
+	maxValuesSizes int = 5000 //100000
 	batchs         int = 1000
 )
 
 func main() {
 	var (
-		batchIndex int = 1
-		vals           = generators.GenerateRanList(int32(maxValuesSizes), int32(upperLimit))
-		ks             = []int{
+		vals = generators.GenerateRanList(int32(maxValuesSizes), int32(upperLimit))
+		ks   = []int{
 			2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
 		}
 
@@ -27,9 +27,10 @@ func main() {
 	)
 	for _, k := range ks {
 		var (
-			heapifyTimes = make([]float64, maxValuesSizes/batchs)
-			bubbleTimes  = make([]float64, maxValuesSizes/batchs)
-			nSizes       = make([]int, maxValuesSizes/batchs)
+			heapifyTimes     = make([]float64, maxValuesSizes/batchs)
+			batchIndex   int = 1
+			bubbleTimes      = make([]float64, maxValuesSizes/batchs)
+			nSizes           = make([]int, maxValuesSizes/batchs)
 		)
 		for ; batchIndex <= maxValuesSizes/batchs; batchIndex += 1 {
 			// Call for garbage collector
@@ -76,8 +77,9 @@ func main() {
 		})
 		// hERE
 	}
-	// generators.GeneratePlots(results)
+	generators.GeneratePlots(results)
 	generators.FromGoToPythonImage(results)
+	generators.SaveGenStatsToCSV(generators.GenerateStats(results))
 }
 
 func bubbleSort(arr []int32) []int32 {

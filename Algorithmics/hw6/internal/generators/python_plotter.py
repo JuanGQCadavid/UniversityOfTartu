@@ -13,11 +13,11 @@ def plot_times(filename):
     
     # Plotting
     plt.figure(figsize=(10, 6))
-    plt.plot(nsizes, heapify_times, marker='o', label='Heapify Times')
-    plt.plot(nsizes, bubble_sort_times, marker='x', label='Bubble Sort Times')
-    plt.xlabel('NSizes')
-    plt.ylabel('Time (seconds)')
-    plt.title('Heapify vs Bubble Sort Times')
+    plt.plot(nsizes, heapify_times, marker='o', label='Heapify')
+    plt.plot(nsizes, bubble_sort_times, marker='x', label='Bubble')
+    plt.xlabel('N size')
+    plt.ylabel('Time in seconds')
+    plt.title('Heapify vs bubble sort')
     plt.legend()
     plt.grid(True)
     
