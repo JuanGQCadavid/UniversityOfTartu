@@ -1,6 +1,7 @@
 package main
 
 import (
+	"hw6/internal/domain"
 	"hw6/internal/generators"
 	"hw6/internal/heap"
 	"log"
@@ -14,13 +15,6 @@ const (
 	batchs         int = 1000
 )
 
-type BatchReport struct {
-	HeapifyTimes    []float64
-	BubbleSortTimes []float64
-	NSizes          []int
-	K               int
-}
-
 func main() {
 	var (
 		batchIndex int = 1
@@ -29,7 +23,7 @@ func main() {
 			2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
 		}
 
-		results = make([]BatchReport, 0, maxValuesSizes/batchs)
+		results = make([]domain.BatchReport, 0, maxValuesSizes/batchs)
 	)
 	for _, k := range ks {
 		var (
@@ -74,7 +68,7 @@ func main() {
 				}
 			}
 		}
-		results = append(results, BatchReport{
+		results = append(results, domain.BatchReport{
 			HeapifyTimes:    heapifyTimes,
 			BubbleSortTimes: bubbleTimes,
 			NSizes:          nSizes,
@@ -82,6 +76,7 @@ func main() {
 		})
 		// hERE
 	}
+	generators.GeneratePlots(results)
 
 }
 
