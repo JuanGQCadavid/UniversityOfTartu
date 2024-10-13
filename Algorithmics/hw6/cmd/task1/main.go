@@ -11,7 +11,7 @@ import (
 
 const (
 	upperLimit     int = 999999999
-	maxValuesSizes int = 50000 //1000000
+	maxValuesSizes int = 10000 //1000000
 	batchs         int = 1000
 )
 
@@ -76,8 +76,8 @@ func main() {
 		})
 		// hERE
 	}
-	generators.GeneratePlots(results)
-
+	// generators.GeneratePlots(results)
+	generators.FromGoToPythonImage(results)
 }
 
 func bubbleSort(arr []int32) []int32 {
