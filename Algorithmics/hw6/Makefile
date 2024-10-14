@@ -10,3 +10,7 @@ clean-ex1:
 clean-root:
 	rm *.png || true \
 	&& rm *.csv || true
+
+
+ex3:
+	go run cmd/task3/main.go 

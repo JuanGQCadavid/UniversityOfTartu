@@ -12,8 +12,8 @@ import (
 const (
 	upperLimit int = 999999999
 	// maxValuesSizes int = 1000000
-	maxValuesSizes int = 5000 //100000
-	batchs         int = 1000
+	maxValuesSizes int = 1000000 //100000
+	batchs         int = 1000000
 )
 
 func main() {
